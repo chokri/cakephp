@@ -108,6 +108,15 @@ class Query extends DatabaseQuery implements JsonSerializable
     protected $_beforeFindFired = false;
 
     /**
+     * The COUNT(*) for the query.
+     *
+     * When set, count query execution will be bypassed.
+     *
+     * @var int
+     */
+    protected $_resultsCount;
+
+    /**
      * Constructor
      *
      * @param \Cake\Datasource\ConnectionInterface $connection The connection object
@@ -710,6 +719,10 @@ class Query extends DatabaseQuery implements JsonSerializable
      */
     public function count()
     {
+        if (isset($this->_resultsCount)) {
+            return $this->_resultsCount;
+        }
+
         $query = $this->cleanCopy();
         $counter = $this->_counter;
         if ($counter) {
@@ -748,9 +761,10 @@ class Query extends DatabaseQuery implements JsonSerializable
                 ->execute();
         }
 
-        $result = $statement->fetch('assoc')['count'];
+        $this->_resultsCount = (int)$statement->fetch('assoc')['count'];
         $statement->closeCursor();
-        return (int)$result;
+
+        return $this->_resultsCount;
     }
 
     /**

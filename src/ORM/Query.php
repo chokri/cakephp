@@ -675,20 +675,9 @@ class Query extends DatabaseQuery implements JsonSerializable, QueryInterface
      */
     public function __clone()
     {
-        $this->_iterator = null;
-        $this->eagerLoader(clone $this->eagerLoader());
-        $this->valueBinder(clone $this->valueBinder());
-        foreach ($this->_parts as $name => $part) {
-            if (is_array($part)) {
-                foreach ($part as $i => $piece) {
-                    if ($part instanceof ExpressionInterface) {
-                        $this->_parts[$name][$i] = clone $piece;
-                    }
-                }
-            }
-            if ($part instanceof ExpressionInterface) {
-                $this->_parts[$name] = clone $part;
-            }
+        parent::__clone();
+        if ($this->_eagerLoader) {
+            $this->_eagerLoader = clone $this->_eagerLoader;
         }
     }
 
